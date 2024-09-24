@@ -1,23 +1,33 @@
-const stringlengrh = function(inputPhrase, maximumlength){
-  if (inputPhrase.length <= maximumlength){
+
+const stringLength = function(inputPhrase, maximumLength) {
+  if (inputPhrase.length <= maximumLength) {
     return true;
-  }else{
+  } else {
     return false;
   }
-
 };
 
-const palindrome = function(inputPhrase){
-  let string = inputPhrase.replaceAll('', '');
+const palindrome = function(inputPhrase) {
+  let string = inputPhrase.replaceAll(' ', '');
   string = string.toUpperCase();
   let newPhrase = '';
-  for (let i = string.length - 1; i >= 0;i--){
+  for (let i = string.length - 1; i >= 0; i--) {
     newPhrase += string[i];
   }
-  if (newPhrase === string){
-    return true;
-  }
-  return false;
+  return newPhrase === string;
 };
 
+function name(input) {
 
+  const str = input.toString();
+  let result = '';
+
+  for (let char of str) {
+
+    if (!Number.isNaN(parseInt(char))) {
+        result += char;
+      }
+    }
+
+    return result ? parseInt(result) : NaN;
+}
