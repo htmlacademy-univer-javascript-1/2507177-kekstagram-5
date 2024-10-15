@@ -1,4 +1,4 @@
-const checkStringLength = function(inputPhrase, maximumLength) {
+const stringLength = function(inputPhrase, maximumLength) {
   if (inputPhrase.length <= maximumLength) {
     return true;
   } else {
