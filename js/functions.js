@@ -12,3 +12,7 @@ function isPalindrome(str) {
 
   return normalizedStr === reversedStr;
 }
+
+checkStringLength('проверяемая строка', 20);
+isPalindrome('топот');
+
