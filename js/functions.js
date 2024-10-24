@@ -1,18 +1,22 @@
-function checkStringLength(str, maxLenath) {
-  return str.length <= maxLenath;
+function parseTime(timeString) {
+  const [hour, minute] = timeString.split(':');
+  return hour * 60 + Number(minute);
 }
 
-function isPalindrome(str) {
-  const normalizedStr = str.replaceAll(' ', '').toLowerCase();
-  let reversedStr = '';
+function chekMeeting(dayStart, dayEnd, meetingStart, meetingDuration) {
+  const dayStartInMinutes = parseTime(dayStart);
+  const dayEndInMinutes = parseTime(meetingStart);
+  const meetingStartInMinutes = parseTime(meetingStart);
 
-  for (let i = normalizedStr.length - 1; i >= 0; i--) {
-    reversedStr += normalizedStr[i];
-  }
-
-  return normalizedStr === reversedStr;
+  return (
+    meetingStartInMinutes >= dayStartInMinutes &&
+    meetingStartInMinutes + meetingDuration <= dayEndInMinutes
+  );
 }
 
-checkStringLength('проверяемая строка', 20);
-isPalindrome('топот');
 
+chekMeeting('08:00', '17:30', '14:00', 90);
+chekMeeting('8:0', '10:0', '8:0', 120);
+chekMeeting('08:00', '14:30', '14:00', 90);
+chekMeeting('14:00', '17:30', '08:0', 90);
+chekMeeting('8:00', '17:30', '08:00', 900);
