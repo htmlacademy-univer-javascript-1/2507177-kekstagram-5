@@ -12,7 +12,7 @@ const createThumbnail = ({ comments, description, likes, url }) => {
   thumbnail.querySelector('.picture__likes').textContent = likes;
 
   return thumbnail;
-}
+};
 
 const renderThumbnails = (pictures) => {
   const fragment = document.createDocumentFragment();
