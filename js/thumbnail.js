@@ -1,4 +1,3 @@
-
 export const renderThumbnails = (photosArray) => {
   const picturesContainer = document.querySelector('.pictures');
   const template = document.getElementById('picture');
@@ -15,6 +14,3 @@ export const renderThumbnails = (photosArray) => {
     picturesContainer.appendChild(pictureElement);
   });
 };
-
-
-
