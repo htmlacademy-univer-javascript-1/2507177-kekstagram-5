@@ -1,25 +1,35 @@
-import { renderThumbnails } from './thumbnail.js';
-import { showBigPicture } from './big-picture.js';
+import { getRandomInteger } from './util.js';
+import { COMMENTS, NAMES } from './data.js';
 
-const container = document.querySelector('.pictures');
-
-const renderGallery = (pictures) => {
-  container.addEventListener('click', (evt) => {
-    const thumbnail = evt.target.closest('[data-thumbnail-id]');
-    if (!thumbnail) {
-      return;
+export const generatePhotosArray = () => {
+  const photos = [];
+  for (let i = 0; i < 25; i++) {
+    const photoData = {
+      id: i + 1,
+      url: `photos/${i + 1}.jpg`,
+      description: `Описание фотографии ${i + 1}`,
+      likes: getRandomInteger(15, 200),
+      comments: []
+    };
+    const commentCount = getRandomInteger(0, 30);
+    const commentIdSet = new Set();
+    for (let j = 0; j < commentCount; j++) {
+      let commentId = getRandomInteger(1, 1000);
+      while (commentIdSet.has(commentId)) {
+        commentId = getRandomInteger(1, 1000);
+      }
+      commentIdSet.add(commentId);
+      const comment = {
+        id: commentId,
+        avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
+        message: COMMENTS[getRandomInteger(0, COMMENTS.length - 1)],
+        name: NAMES[getRandomInteger(0, NAMES.length - 1)]
+      };
+      photoData.comments.push(comment);
     }
-
-    evt.preventDefault();
-    const picture = pictures.find(
-      (item) => item.id === +thumbnail.dataset.thumbnailId
-    );
-    showBigPicture(picture);
-  });
-
-  renderThumbnails(pictures, container);
+    photos.push(photoData);
+  }
+  return photos;
 };
-
-export { renderGallery };
 
 
