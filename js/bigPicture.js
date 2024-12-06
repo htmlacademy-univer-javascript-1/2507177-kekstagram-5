@@ -1,51 +1,65 @@
 import { photosArray } from './main.js';
 
-
-const renderBigPicture = (photoData) => {
+const renderBigPicture = (photo) => {
   const bigPicture = document.querySelector('.big-picture');
-  const img = bigPicture.querySelector('.big-picture__img');
-  const captionElement = bigPicture.querySelector('.social__caption');
-  const likesCountElement = bigPicture.querySelector('.likes-count');
-  const commentsCountElement = bigPicture.querySelector('.comments-count');
-  const commentsListElement = bigPicture.querySelector('.social__comments');
-  const thumbnailLikes = document.querySelectorAll('.picture__likes');
-
-  img.src = photoData.url;
-  img.alt = photoData.description;
-  captionElement.textContent = photoData.description;
-  likesCountElement.textContent = photoData.likes;
-  commentsCountElement.textContent = photoData.comments.length;
+  const img = bigPicture.querySelector('.big-picture__img img');
+  const caption = bigPicture.querySelector('.social__caption');
+  const likesCount = bigPicture.querySelector('.likes-count');
+  const commentsCount = bigPicture.querySelector('.comments-count');
+  const commentsList = bigPicture.querySelector('.social__comments');
 
 
-  photoData.comments.forEach((comment) => {
-    const commentItem = document.createElement('li');
-    commentItem.classList.add('social__comment');
-    commentItem.innerHTML = `
-      <img class="social__picture" src="${comment.avatar}" alt="${comment.name}" width="35" height="35">
-      <p class="social__text">${comment.message}</p>
-    `;
-    commentsListElement.appendChild(commentItem);
-  });
+  img.src = photo.url;
+  img.alt = photo.description;
+  caption.textContent = photo.description;
+  likesCount.textContent = photo.likes;
+  commentsCount.textContent = photo.comments.length;
 
-  const likesCountSpan = document.querySelector('.likes-count');
-  let hasLiked = false;
 
-  likesCountSpan.addEventListener('click', () => {
-    if (!hasLiked) {
-      photoData.likes += 1;
-      thumbnailLikes[photoData.id - 1].textContent = parseInt(thumbnailLikes[photoData.id - 1].textContent, 10) + 1;
-      likesCountSpan.textContent = photoData.likes;
-      hasLiked = true;
-    } else {
-      photoData.likes -= 1;
-      thumbnailLikes[photoData.id - 1].textContent = parseInt(thumbnailLikes[photoData.id - 1].textContent, 10) - 1;
-      likesCountSpan.textContent = photoData.likes;
-      hasLiked = false;
-    }
-  });
+  updateComments(commentsList, photo.comments);
+
+
+  setupLikesManagement(photo, likesCount);
+
 
   bigPicture.classList.remove('hidden');
   document.body.classList.add('modal-open');
+};
+
+const updateComments = (commentsList, comments) => {
+  commentsList.innerHTML = '';
+  comments.forEach((comment) => {
+    const commentElement = document.createElement('li');
+    commentElement.classList.add('social__comment');
+    commentElement.innerHTML = `
+      <img class="social__picture" src="${comment.avatar}" alt="${comment.name}" width="35" height="35">
+      <p class="social__text">${comment.message}</p>
+    `;
+    commentsList.appendChild(commentElement);
+  });
+};
+
+const setupLikesManagement = (photo, likesCountSpan) => {
+  let isLiked = false;
+  const thumbnailLikes = document.querySelectorAll('.picture__likes');
+
+
+  likesCountSpan.removeEventListener('click', toggleLike);
+  likesCountSpan.addEventListener('click', toggleLike);
+
+  function toggleLike() {
+    if (!isLiked) {
+      photo.likes += 1;
+      thumbnailLikes[photo.id - 1].textContent = parseInt(thumbnailLikes[photo.id - 1].textContent, 10) + 1;
+      likesCountSpan.textContent = photo.likes;
+      isLiked = true;
+    } else {
+      photo.likes -= 1;
+      thumbnailLikes[photo.id - 1].textContent = parseInt(thumbnailLikes[photo.id - 1].textContent, 10) - 1;
+      likesCountSpan.textContent = photo.likes;
+      isLiked = false;
+    }
+  }
 };
 
 const closeBigPicture = () => {
@@ -56,14 +70,14 @@ const closeBigPicture = () => {
 
 const picturesContainer = document.querySelector('.pictures');
 picturesContainer.addEventListener('click', (event) => {
-  const pictureElement = event.target.closest('.picture');
-  if (!pictureElement) {
+  const picture = event.target.closest('.picture');
+  if (!picture) {
     return;
   }
-  const photoId = pictureElement.dataset.photoId;
-  const photoData = photosArray.find((item) => item.id === +photoId);
-  if (photoData) {
-    renderBigPicture(photoData);
+  const photoId = picture.dataset.photoId;
+  const photo = photosArray.find((item) => item.id === +photoId);
+  if (photo) {
+    renderBigPicture(photo);
   }
 });
 
