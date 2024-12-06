@@ -1,34 +1,19 @@
 import { photosArray } from './main.js';
 
-const renderBigPicture = (photo) => {
+const renderBigPicture = (photoData) => {
   const bigPicture = document.querySelector('.big-picture');
   const img = bigPicture.querySelector('.big-picture__img img');
   const caption = bigPicture.querySelector('.social__caption');
   const likesCount = bigPicture.querySelector('.likes-count');
   const commentsCount = bigPicture.querySelector('.comments-count');
   const commentsList = bigPicture.querySelector('.social__comments');
-
-
-  img.src = photo.url;
-  img.alt = photo.description;
-  caption.textContent = photo.description;
-  likesCount.textContent = photo.likes;
-  commentsCount.textContent = photo.comments.length;
-
-
-  updateComments(commentsList, photo.comments);
-
-
-  setupLikesManagement(photo, likesCount);
-
-
-  bigPicture.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-};
-
-const updateComments = (commentsList, comments) => {
-  commentsList.innerHTML = '';
-  comments.forEach((comment) => {
+  const pictureInfo = document.querySelectorAll('.picture__likes');
+  img.src = photoData.url;
+  img.alt = photoData.description;
+  caption.textContent = photoData.description;
+  likesCount.textContent = photoData.likes;
+  commentsCount.textContent = photoData.comments.length;
+  photoData.comments.forEach((comment) => {
     const commentElement = document.createElement('li');
     commentElement.classList.add('social__comment');
     commentElement.innerHTML = `
@@ -37,29 +22,25 @@ const updateComments = (commentsList, comments) => {
     `;
     commentsList.appendChild(commentElement);
   });
-};
 
-const setupLikesManagement = (photo, likesCountSpan) => {
+  const likesBigSpan = document.querySelector('.likes-count');
   let isLiked = false;
-  const thumbnailLikes = document.querySelectorAll('.picture__likes');
 
-
-  likesCountSpan.removeEventListener('click', toggleLike);
-  likesCountSpan.addEventListener('click', toggleLike);
-
-  function toggleLike() {
+  likesBigSpan.addEventListener('click', () => {
     if (!isLiked) {
-      photo.likes += 1;
-      thumbnailLikes[photo.id - 1].textContent = parseInt(thumbnailLikes[photo.id - 1].textContent, 10) + 1;
-      likesCountSpan.textContent = photo.likes;
+      photoData.likes += 1;
+      pictureInfo[photoData.id - 1].textContent = parseInt(pictureInfo[photoData.id - 1].textContent, 10) + 1;
+      likesBigSpan.textContent = photoData.likes;
       isLiked = true;
     } else {
-      photo.likes -= 1;
-      thumbnailLikes[photo.id - 1].textContent = parseInt(thumbnailLikes[photo.id - 1].textContent, 10) - 1;
-      likesCountSpan.textContent = photo.likes;
+      photoData.likes -= 1;
+      pictureInfo[photoData.id - 1].textContent = parseInt(pictureInfo[photoData.id - 1].textContent, 10) - 1;
+      likesBigSpan.textContent = photoData.likes;
       isLiked = false;
     }
-  }
+  });
+  bigPicture.classList.remove('hidden');
+  document.body.classList.add('modal-open');
 };
 
 const closeBigPicture = () => {
@@ -75,9 +56,9 @@ picturesContainer.addEventListener('click', (event) => {
     return;
   }
   const photoId = picture.dataset.photoId;
-  const photo = photosArray.find((item) => item.id === +photoId);
-  if (photo) {
-    renderBigPicture(photo);
+  const photoData = photosArray.find((item) => item.id === +photoId);
+  if (photoData) {
+    renderBigPicture(photoData);
   }
 });
 
