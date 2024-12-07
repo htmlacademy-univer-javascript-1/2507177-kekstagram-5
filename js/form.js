@@ -1,4 +1,3 @@
-
 import { resetScale } from './scale.js';
 import { init, reset } from './effects.js';
 
