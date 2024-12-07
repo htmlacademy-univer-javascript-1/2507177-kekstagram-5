@@ -1,5 +1,5 @@
-import { getPictures } from './data.js';
-import { renderThumbnails } from './thumbnails.js';
-import './form.js';
+import { generatePhotosArray } from './gallery.js';
+import { thumbnail } from './thumbnail.js';
 
-renderThumbnails(getPictures());
+export const photosArray = generatePhotosArray();
+thumbnail(photosArray);
