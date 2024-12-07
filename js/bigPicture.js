@@ -30,18 +30,6 @@ const toggleLike = () => {
   }
 };
 
-const onEscapeKeyDown = (event) => {
-  if (event.key === 'Escape') {
-    // eslint-disable-next-line no-use-before-define
-    closeBigPicture();
-  }
-};
-
-const renderComments = () => {
-
-
-
-
 const renderComments = () => {
   const commentsToDisplay = activePhoto.comments.slice(
     visibleCommentsCount,
