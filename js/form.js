@@ -1,61 +1,101 @@
-const body = document.querySelector('body');
-const form = document.querySelector('.img-upload__form');
-const overlay = form.querySelector('.img-upload__overlay');
-const cancelButton = form.querySelector('.img-upload__cancel');
-const fileField = form.querySelector('.img-upload__input');
-const hashtagField = form.querySelector('.text__hashtags');
+import { resetScale } from './scale.js';
+import { init, reset } from './effects.js';
 
+
+const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
 const VALID_HASHTAG = /^#[a-zа-яё0-9]{1,19}$/i;
 
-const ErrorText = {
-  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
-  NOT_UNIQUE: 'Хештеги должны быть уникальными',
-  INVALID_PATTERN: 'Неправильный хештег',
-};
+const imgUploadForm = document.querySelector('.img-upload__form');
+const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+const imgUploadCancel = document.querySelector('.img-upload__cancel');
+const textHashtags = document.querySelector('.text__hashtags');
+const textDescription = document.querySelector('.text__description');
+const body = document.body;
 
-const normalizeTags = (tagString) => tagString.trim().split(' ').filter(Boolean);
-
-const isValidTags = (value) => {
-  const tags = normalizeTags(value);
-  const isValidCount = tags.length <= MAX_HASHTAG_COUNT;
-  const isValidUnique = new Set(tags.map((tag) => tag.toLowerCase())).size === tags.length;
-  const isValidPattern = tags.every((tag) => VALID_HASHTAG.test(tag));
-
-  return isValidCount && isValidUnique && isValidPattern;
-};
-
-const pristine = new Pristine(form, {
+const pristine = new Pristine(imgUploadForm, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
-  errorTextClass: 'img-upload__field-wrapper--error',
 });
 
-pristine.addValidator(hashtagField, isValidTags, ErrorText.INVALID_PATTERN, 3, true);
+function validateComment(value) {
+  return value.length <= MAX_COMMENT_LENGTH;
+}
 
-const toggleModal = (isVisible) => {
-  overlay.classList.toggle('hidden', !isVisible);
-  body.classList.toggle('modal-open', isVisible);
-  if (isVisible) {
-    document.addEventListener('keydown', onDocumentKeydown);
-  } else {
-    document.removeEventListener('keydown', onDocumentKeydown);
+pristine.addValidator(
+  imgUploadForm.querySelector('.text__description'),
+  validateComment,
+  'Длина комментария не может составлять больше 140 символов'
+);
+
+const splitHashtags = (hashtags) => hashtags.trim().split(/\s+/);
+
+function validateHashtagItems(value) {
+  const hashtags = splitHashtags(value);
+  const isValidCount = hashtags.length <= MAX_HASHTAG_COUNT;
+  const isValidText = hashtags.every((hashtag) => VALID_HASHTAG.test(hashtag));
+  const isUnique = hashtags.length === new Set(hashtags.map((hashtag) => hashtag.toLowerCase())).size;
+
+  return {isValidCount, isValidText, isUnique};
+}
+
+function validateHashtag(value) {
+  const {isValidCount, isValidText, isUnique} = validateHashtagItems(value);
+  return isValidCount && isValidText && isUnique;
+}
+
+const getHashtagErrorMessage = (value) => {
+  const {isValidCount, isValidText, isUnique} = validateHashtagItems(value);
+
+  if (!isValidCount) {
+    return 'Нельзя указать больше пяти хэш-тегов';
   }
+  if (!isValidText) {
+    return 'Строка после решётки должна состоять из букв и чисел и иметь длину не более 20 символов';
+  }
+  if (!isUnique) {
+    return 'Один и тот же хэш-тег не может быть использован дважды';
+  }
+  return true;
+};
+
+pristine.addValidator(
+  imgUploadForm.querySelector('.text__hashtags'),
+  validateHashtag,
+  getHashtagErrorMessage
+);
+
+imgUploadForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  pristine.validate();
+});
+
+
+const showForm = () => {
+  imgUploadOverlay.classList.remove('hidden');
+  body.classList.add('modal-open');
+  document.addEventListener('keydown', onDocumentKeydown);
+};
+
+const closeForm = () => {
+  imgUploadForm.reset();
+  imgUploadOverlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  resetScale();
+  reset();
 };
 
 function onDocumentKeydown(evt) {
-  if (evt.key === 'Escape' && !document.activeElement.matches('.text__hashtags, .text_description')) {
+  const isInputFocused = [textHashtags, textDescription].some((el) => el === evt.target);
+  if (evt.key === 'Escape' && !isInputFocused){
     evt.preventDefault();
-    toggleModal(false);
+    closeForm();
   }
 }
 
-fileField.addEventListener('change', () => toggleModal(true));
-cancelButton.addEventListener('click', () => toggleModal(false));
 
-form.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-  if (pristine.validate()) {
-    form.submit();
-  }
-});
+imgUploadCancel.addEventListener('keydown', onDocumentKeydown);
+imgUploadCancel.addEventListener('click', closeForm);
+imgUploadForm.addEventListener('change', showForm);
+init();
