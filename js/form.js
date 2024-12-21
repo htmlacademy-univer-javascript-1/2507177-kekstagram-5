@@ -64,6 +64,8 @@ const hideModal = () => {
   form.removeEventListener('submit', onFormSubmit);
 };
 
+const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
+
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
