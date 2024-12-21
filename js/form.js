@@ -3,94 +3,94 @@ import { init as initEffect, reset as resetEffect } from './effects.js';
 import { sendData } from './api.js';
 import { displayErrorMessage, displaySuccessMessage } from './message.js';
 
-const documentBody = document.querySelector('body');
-const uploadForm = document.querySelector('.img-upload__form');
-const modalOverlay = uploadForm.querySelector('.img-upload__overlay');
-const closeButton = uploadForm.querySelector('.img-upload__cancel');
-const imageInput = uploadForm.querySelector('.img-upload__input');
-const descriptionField = uploadForm.querySelector('.text_description');
-const imagePreview = uploadForm.querySelector('.img-upload__preview');
-const effectPreviews = uploadForm.querySelectorAll('.effects__preview');
-const submitButton = uploadForm.querySelector('.img-upload__submit');
+const body = document.querySelector('body');
+const form = document.querySelector('.img-upload__form');
+const overlay = form.querySelector('.img-upload__overlay');
+const cancelButton = form.querySelector('.img-upload__cancel');
+const fileField = form.querySelector('.img-upload__input');
+const commentField = form.querySelector('.text_description');
+const imgPreview = form.querySelector('.img-upload__preview');
+const effectsPreview = form.querySelectorAll('.effects__preview');
+const submitButton = form.querySelector('.img-upload__submit');
 
-const hashtagInput = uploadForm.querySelector('.text__hashtags');
+const hashtagField = form.querySelector('.text__hashtags');
 const MAX_HASHTAG_COUNT = 5;
-const VALID_TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
-const ErrorMessages = {
-  EXCEEDS_MAX_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
-  NON_UNIQUE_HASHTAGS: 'Хешетеги должны быть уникальными',
-  INVALID_HASHTAG_FORMAT: 'Неправильный хештег',
+const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
+const ErrorText = {
+  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
+  NOT_UNIQUE: 'Хешетеги должны быть уникальными',
+  INVALID_PATTERN: 'Неправильный хештег',
 };
 
-const pristineValidator = new Pristine(uploadForm, {
+const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
-const closeModal = () => {
-  uploadForm.reset();
+const hideModal = () => {
+  form.reset();
   resetImageScale();
   resetEffect();
-  pristineValidator.reset();
-  modalOverlay.classList.add('hidden');
-  documentBody.classList.remove('modal-open');
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
-  uploadForm.removeEventListener('submit', onFormSubmit);
+  form.removeEventListener('submit', onFormSubmit);
 };
 
-const onFormSubmit = async (evt) => {
+const onFormSubmit = (async (evt) => {
   evt.preventDefault();
-  if (pristineValidator.validate()) {
+  if (pristine.validate()) {
     submitButton.disabled = true;
-    await sendData(new FormData(uploadForm))
-      .then(() => {
+    await sendData(new FormData(form))
+      .then (() => {
         displaySuccessMessage();
-        closeModal();
+        hideModal();
       })
       .catch(() => {
         displayErrorMessage();
-        closeModal();
+        hideModal();
       });
   }
-};
+});
 
-const openModal = (evt) => {
-  imagePreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
-  const imageURL = imagePreview.querySelector('img').src;
-  effectPreviews.forEach((element) => {
+const showModal = (evt) => {
+  imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
+  const imageURL = imgPreview.querySelector('img').src;
+  effectsPreview.forEach((element) => {
     element.style.backgroundImage = `url('${imageURL}')`;
   });
-  uploadForm.addEventListener('submit', onFormSubmit);
-  modalOverlay.classList.remove('hidden');
-  documentBody.classList.add('modal-open');
+  form.addEventListener('submit', onFormSubmit);
+  overlay.classList.remove('hidden');
+  body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
-const isTextInputFocused = () => document.activeElement === hashtagInput || document.activeElement === descriptionField;
+const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
 
 function onDocumentKeydown(evt) {
-  if (evt.key === 'Escape' && !isTextInputFocused()) {
+  if (evt.key === 'Escape' && !isTextFieldFocused()) {
     evt.preventDefault();
-    closeModal();
+    hideModal();
   }
 }
 
-const onCloseButtonClick = () => {
-  closeModal();
+const onCancelButtonClick = () => {
+  hideModal();
 };
 
 const onFileInputChange = (evt) => {
-  openModal(evt);
+  showModal(evt);
 };
 
-imageInput.addEventListener('change', onFileInputChange);
-closeButton.addEventListener('click', onCloseButtonClick);
+fileField.addEventListener('change', onFileInputChange);
+cancelButton.addEventListener('click', onCancelButtonClick);
 initEffect();
 
 const normalizeTags = (tagString) => tagString.trim().split(' ').filter((tag) => Boolean(tag.length));
 
-const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_TAG_PATTERN.test(tag));
+const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_SYMBOLS.test(tag));
 
 const hasValidCount = (value) => normalizeTags(value).length <= MAX_HASHTAG_COUNT;
 
@@ -99,9 +99,8 @@ const hasUniqueTags = (value) => {
   return lowerCaseTags.length === new Set(lowerCaseTags).size;
 };
 
-pristineValidator.addValidator(hashtagInput, hasValidCount, ErrorMessages.EXCEEDS_MAX_COUNT, 3, true);
+pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
 
-pristineValidator.addValidator(hashtagInput, hasUniqueTags, ErrorMessages.NON_UNIQUE_HASHTAGS, 1, true);
+pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
 
-pristineValidator.addValidator(hashtagInput, hasValidTags, ErrorMessages.INVALID_HASHTAG_FORMAT, 2, true);
-
+pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);
