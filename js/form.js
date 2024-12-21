@@ -17,7 +17,7 @@ const hashtagField = form.querySelector('.text__hashtags');
 const MAX_HASHTAG_COUNT = 5;
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const ErrorText = {
-  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`, // Исправлено: использовали обратные кавычки для интерполяции
+  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
   NOT_UNIQUE: 'Хештеги должны быть уникальными',
   INVALID_PATTERN: 'Неправильный хештег',
 };
@@ -28,13 +28,31 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+// Определяем onFormSubmit перед его использованием
+const onFormSubmit = async (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    submitButton.disabled = true;
+    await sendData(new FormData(form))
+      .then(() => {
+        displaySuccessMessage();
+        hideModal();
+      })
+      .catch(() => {
+        displayErrorMessage();
+        hideModal();
+      });
+    submitButton.disabled = false; // Разблокировка кнопки в конце
+  }
+};
+
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
   effectsPreview.forEach((element) => {
     element.style.backgroundImage = `url('${imageURL}')`;
   });
-  form.addEventListener('submit', onFormSubmit);
+  form.addEventListener('submit', onFormSubmit); // Используем определённую функцию
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
@@ -68,22 +86,6 @@ const onFileInputChange = (evt) => {
   showModal(evt);
 };
 
-const onFormSubmit = ('submit', async (evt) => {
-  evt.preventDefault();
-  if (pristine.validate()) {
-    submitButton.disabled = true;
-    await sendData(new FormData(form))
-    .then (() => {
-      displaySuccessMessage();
-      hideModal();
-    })
-    .catch(() => {
-      displayErrorMessage();
-      hideModal();
-    })
-  }
-});
-
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
 initEffect();
@@ -100,7 +102,5 @@ const hasUniqueTags = (value) => {
 };
 
 pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
-
 pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
-
 pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);
