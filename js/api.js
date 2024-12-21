@@ -1,27 +1,32 @@
 const SERVER_URL = 'https://29.javascript.htmlacademy.pro/kekstagram';
-const ROUTE = {
-  GET_DATA:'/data',
-  SEND_DATA:'/'
+const API_ROUTES = {
+  FETCH_DATA: '/data',
+  SUBMIT_DATA: '/'
 };
-const METHOD = {
-  GET:'GET',
+
+const HTTP_METHODS = {
+  GET: 'GET',
   POST: 'POST'
 };
-const ERROR_TEXT = {
-  GET_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
-  SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз'
+
+const ERROR_MESSAGES = {
+  FETCH_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
+  SUBMIT_DATA: 'Не удалось отправить форму. Попробуйте ещё раз'
 };
-const loadData = (route, errorText, method = METHOD.GET, body = null) =>
-  fetch(`${SERVER_URL}${route}`, {method, body})
+
+const fetchData = (route, errorMessage, method = HTTP_METHODS.GET, requestBody = null) =>
+  fetch(`${SERVER_URL}${route}`, { method, body: requestBody })
     .then((response) => {
-      if (response.ok){
+      if (response.ok) {
         return response.json();
       }
       throw new Error();
     })
     .catch(() => {
-      throw new Error(errorText);
+      throw new Error(errorMessage);
     });
-const getData = () => loadData(ROUTE.GET_DATA, ERROR_TEXT.GET_DATA);
-const sendData = (body) => loadData(ROUTE.SEND_DATA, ERROR_TEXT.SEND_DATA, METHOD.POST, body);
-export {getData, sendData};
+
+const getData = () => fetchData(API_ROUTES.FETCH_DATA, ERROR_MESSAGES.FETCH_DATA);
+const sendData = (requestBody) => fetchData(API_ROUTES.SUBMIT_DATA, ERROR_MESSAGES.SUBMIT_DATA, HTTP_METHODS.POST, requestBody);
+
+export { getData, sendData };

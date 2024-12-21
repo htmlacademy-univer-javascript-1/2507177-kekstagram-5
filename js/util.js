@@ -30,12 +30,12 @@ const getUniqueNumber = (list, usedNumbers) => {
   return uniqueNumber;
 };
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
+const isEscape = (evt) => evt.key === 'Escape';
 
 export {
   getRandomInteger,
   getUniqueNumber,
   getRandomElementsArray,
-  isEscapeKey,
+  isEscape,
   debounce
 };

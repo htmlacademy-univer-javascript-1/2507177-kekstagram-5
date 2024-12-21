@@ -1,4 +1,4 @@
-import {isEscapeKey} from './util.js';
+import {isEscape} from './util.js';
 
 const documentBody = document.body;
 const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
@@ -14,7 +14,7 @@ const removeMessage = () => {
 };
 
 function closeMessageByEscape(evt) {
-  if (isEscapeKey(evt)) {
+  if (isEscape(evt)) {
     evt.preventDefault();
     removeMessage();
   }
