@@ -1,102 +1,106 @@
+import { resetImageScale } from './scale.js';
+import { init as initEffect, reset as resetEffect } from './effects.js';
+import { sendData } from './api.js';
+import { displayErrorMessage, displaySuccessMessage } from './message.js';
 
-import { resetScale } from './scale.js';
-import { init, reset } from './effects.js';
+const body = document.querySelector('body');
+const form = document.querySelector('.img-upload__form');
+const overlay = form.querySelector('.img-upload__overlay');
+const cancelButton = form.querySelector('.img-upload__cancel');
+const fileField = form.querySelector('.img-upload__input');
+const commentField = form.querySelector('.text_description');
+const imgPreview = form.querySelector('.img-upload__preview');
+const effectsPreview = form.querySelectorAll('.effects__preview');
+const submitButton = form.querySelector('.img-upload__submit');
 
-
-const MAX_COMMENT_LENGTH = 140;
+const hashtagField = form.querySelector('.text__hashtags');
 const MAX_HASHTAG_COUNT = 5;
-const VALID_HASHTAG = /^#[a-zа-яё0-9]{1,19}$/i;
-
-const imgUploadForm = document.querySelector('.img-upload__form');
-const imgUploadOverlay = document.querySelector('.img-upload__overlay');
-const imgUploadCancel = document.querySelector('.img-upload__cancel');
-const textHashtags = document.querySelector('.text__hashtags');
-const textDescription = document.querySelector('.text__description');
-const body = document.body;
-
-const pristine = new Pristine(imgUploadForm, {
-  classTo: 'img-upload__field-wrapper',
-  errorTextParent: 'img-upload__field-wrapper',
-});
-
-function validateComment(value) {
-  return value.length <= MAX_COMMENT_LENGTH;
-}
-
-pristine.addValidator(
-  imgUploadForm.querySelector('.text__description'),
-  validateComment,
-  'Длина комментария не может составлять больше 140 символов'
-);
-
-const splitHashtags = (hashtags) => hashtags.trim().split(/\s+/);
-
-function validateHashtagItems(value) {
-  const hashtags = splitHashtags(value);
-  const isValidCount = hashtags.length <= MAX_HASHTAG_COUNT;
-  const isValidText = hashtags.every((hashtag) => VALID_HASHTAG.test(hashtag));
-  const isUnique = hashtags.length === new Set(hashtags.map((hashtag) => hashtag.toLowerCase())).size;
-
-  return {isValidCount, isValidText, isUnique};
-}
-
-function validateHashtag(value) {
-  const {isValidCount, isValidText, isUnique} = validateHashtagItems(value);
-  return isValidCount && isValidText && isUnique;
-}
-
-const getHashtagErrorMessage = (value) => {
-  const {isValidCount, isValidText, isUnique} = validateHashtagItems(value);
-
-  if (!isValidCount) {
-    return 'Нельзя указать больше пяти хэш-тегов';
-  }
-  if (!isValidText) {
-    return 'Строка после решётки должна состоять из букв и чисел и иметь длину не более 20 символов';
-  }
-  if (!isUnique) {
-    return 'Один и тот же хэш-тег не может быть использован дважды';
-  }
-  return true;
+const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
+const ErrorText = {
+  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
+  NOT_UNIQUE: 'Хешетеги должны быть уникальными',
+  INVALID_PATTERN: 'Неправильный хештег',
 };
 
-pristine.addValidator(
-  imgUploadForm.querySelector('.text__hashtags'),
-  validateHashtag,
-  getHashtagErrorMessage
-);
-
-imgUploadForm.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-  pristine.validate();
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+const hideModal = () => {
+  form.reset();
+  resetImageScale();
+  resetEffect();
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit); // eslint-disable-line
+};
 
-const showForm = () => {
-  imgUploadOverlay.classList.remove('hidden');
+const onFormSubmit = (async (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    submitButton.disabled = true;
+    await sendData(new FormData(form))
+      .then (() => {
+        displaySuccessMessage();
+        hideModal();
+      })
+      .catch(() => {
+        displayErrorMessage();
+        hideModal();
+      });
+  }
+});
+
+const showModal = (evt) => {
+  imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
+  const imageURL = imgPreview.querySelector('img').src;
+  effectsPreview.forEach((element) => {
+    element.style.backgroundImage = `url('${imageURL}')`;
+  });
+  form.addEventListener('submit', onFormSubmit);
+  overlay.classList.remove('hidden');
   body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
-const closeForm = () => {
-  imgUploadForm.reset();
-  imgUploadOverlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  resetScale();
-  reset();
-};
+const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
 
 function onDocumentKeydown(evt) {
-  const isInputFocused = [textHashtags, textDescription].some((el) => el === evt.target);
-  if (evt.key === 'Escape' && !isInputFocused){
+  if (evt.key === 'Escape' && !isTextFieldFocused()) {
     evt.preventDefault();
-    closeForm();
+    hideModal();
   }
 }
 
+const onCancelButtonClick = () => {
+  hideModal();
+};
 
-imgUploadCancel.addEventListener('keydown', onDocumentKeydown);
-imgUploadCancel.addEventListener('click', closeForm);
-imgUploadForm.addEventListener('change', showForm);
-init();
+const onFileInputChange = (evt) => {
+  showModal(evt);
+};
+
+fileField.addEventListener('change', onFileInputChange);
+cancelButton.addEventListener('click', onCancelButtonClick);
+initEffect();
+
+const normalizeTags = (tagString) => tagString.trim().split(' ').filter((tag) => Boolean(tag.length));
+
+const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_SYMBOLS.test(tag));
+
+const hasValidCount = (value) => normalizeTags(value).length <= MAX_HASHTAG_COUNT;
+
+const hasUniqueTags = (value) => {
+  const lowerCaseTags = normalizeTags(value).map((tag) => tag.toLowerCase());
+  return lowerCaseTags.length === new Set(lowerCaseTags).size;
+};
+
+pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
+
+pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
+
+pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);

@@ -1,26 +1,41 @@
-const SCALE_STEP = 25;
-const MIN_SCALE = 25;
-const MAX_SCALE = 100;
-const DEFAULT_SCALE = 100;
-const PERCENT = 100;
-const modalElement = document.querySelector('.img-upload');
-const scaleInputElement = modalElement.querySelector('.scale__control--value');
-const imageElement = modalElement.querySelector('.img-upload__preview img');
-const scaleImage = (value) => {
-  imageElement.style.transform = `scale(${value / PERCENT})`;
-  scaleInputElement.value = `${value}%`;
+
+const SCALE_INCREMENT = 25;
+const MIN_SCALE_VALUE = 25;
+const INITIAL_SCALE_VALUE = 100;
+
+const uploadModalElement = document.querySelector('.img-upload');
+const decreaseButtonElement = uploadModalElement.querySelector('.scale__control--smaller');
+const increaseButtonElement = uploadModalElement.querySelector('.scale__control--bigger');
+const scaleValueInputElement = uploadModalElement.querySelector('.scale__control--value');
+const previewImageElement = uploadModalElement.querySelector('.img-upload__preview img');
+const updateImageScale = (value) => {
+  previewImageElement.style.transform = `scale(${value / 100})`;
+  scaleValueInputElement.value = `${value}%`;
 };
-const onSmallerButtonClick = () => {
-  scaleImage(
-    Math.max(parseInt(scaleInputElement.value, 10) - SCALE_STEP, MIN_SCALE)
-  );
+
+const onDecreaseButtonClick = () => {
+  const currentScaleValue = parseInt(scaleValueInputElement.value, 10);
+  const newScaleValue = currentScaleValue - SCALE_INCREMENT;
+  if (newScaleValue >= MIN_SCALE_VALUE) {
+    updateImageScale(newScaleValue);
+  } else {
+    decreaseButtonElement.setAttribute('disabled', true);
+  }
 };
-const onBiggerButtonClick = () => {
-  scaleImage(
-    Math.min(parseInt(scaleInputElement.value, 10) + SCALE_STEP, MAX_SCALE)
-  );
+
+const onIncreaseButtonClick = () => {
+  const currentScaleValue = parseInt(scaleValueInputElement.value, 10);
+  const newScaleValue = currentScaleValue + SCALE_INCREMENT;
+  if (newScaleValue <= INITIAL_SCALE_VALUE) {
+    updateImageScale(newScaleValue);
+  } else {
+    increaseButtonElement.setAttribute('disabled', true);
+  }
 };
-const resetScale = () => scaleImage(DEFAULT_SCALE);
-modalElement.querySelector('.scale__control--smaller').addEventListener('click', onSmallerButtonClick);
-modalElement.querySelector('.scale__control--bigger').addEventListener('click', onBiggerButtonClick);
-export { resetScale };
+
+const resetImageScale = () => updateImageScale(INITIAL_SCALE_VALUE);
+
+decreaseButtonElement.addEventListener('click', onDecreaseButtonClick);
+increaseButtonElement.addEventListener('click', onIncreaseButtonClick);
+
+export { resetImageScale };
