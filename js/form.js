@@ -28,6 +28,16 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+const hideModal = () => {
+  form.reset();
+  resetImageScale();
+  resetEffect();
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit);
+};
 const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
@@ -52,16 +62,6 @@ const onDocumentKeydown = (evt) => {
     evt.preventDefault();
     hideModal();
   }
-};
-const hideModal = () => {
-  form.reset();
-  resetImageScale();
-  resetEffect();
-  pristine.reset();
-  overlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  form.removeEventListener('submit', onFormSubmit);
 };
 
 const showModal = (evt) => {
