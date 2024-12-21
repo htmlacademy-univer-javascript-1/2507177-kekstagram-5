@@ -1,36 +1,37 @@
 import {openBigPicture} from './bigPicture.js';
 
 
-const thumbnailTemplate = document
+const thumbnailTemplateElement = document
   .querySelector('#picture')
   .content.querySelector('.picture');
-const container = document.querySelector('.pictures');
+const picturesContainer = document.querySelector('.pictures');
 
-const createThumbnail = (data) => {
-  const { likes, url, description, comments } = data;
-  const thumbnail = thumbnailTemplate.cloneNode(true);
+const createThumbnailElement = (pictureData) => {
+  const { likes, url, description, comments } = pictureData;
+  const thumbnailElement = thumbnailTemplateElement.cloneNode(true);
 
-  thumbnail.querySelector('.picture__img').src = url;
-  thumbnail.querySelector('.picture__img').alt = description;
-  thumbnail.querySelector('.picture__comments').textContent = comments.length;
-  thumbnail.querySelector('.picture__likes').textContent = likes;
+  thumbnailElement.querySelector('.picture__img').src = url;
+  thumbnailElement.querySelector('.picture__img').alt = description;
+  thumbnailElement.querySelector('.picture__comments').textContent = comments.length;
+  thumbnailElement.querySelector('.picture__likes').textContent = likes;
 
-  thumbnail.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    openBigPicture(data);
+  thumbnailElement.addEventListener('click', (event) => {
+    event.preventDefault();
+    openBigPicture(pictureData);
   });
 
-  return thumbnail;
+  return thumbnailElement;
 };
 
-const renderThumbnails = (pictures) => {
+const renderThumbnailElements = (picturesArray) => {
   const fragment = document.createDocumentFragment();
-  pictures.forEach((picture) => {
-    const thumbnail = createThumbnail(picture);
-    fragment.append(thumbnail);
+  picturesArray.forEach((picture) => {
+    const thumbnailElement = createThumbnailElement(picture);
+    fragment.append(thumbnailElement);
   });
 
-  container.append(fragment);
+  picturesContainer.append(fragment);
 };
 
-export { renderThumbnails };
+export { renderThumbnailElements };
+
