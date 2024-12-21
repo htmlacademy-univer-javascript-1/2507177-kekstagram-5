@@ -28,6 +28,7 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+
 const onDocumentKeydown = (evt) => {
   if (evt.key === 'Escape' && !isTextFieldFocused()) {
     evt.preventDefault();
@@ -39,20 +40,18 @@ const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
     submitButton.disabled = true;
-    try {
-      await sendData(new FormData(form));
-      displaySuccessMessage();
-      hideModal();
-    } catch (error) {
-      displayErrorMessage(error); // Pass the error to the function
-      console.error("Ошибка отправки данных:", error);
-    } finally {
-      submitButton.disabled = false;
-    }
+    await sendData(new FormData(form))
+      .then(() => {
+        displaySuccessMessage();
+        hideModal();
+      })
+      .catch(() => {
+        displayErrorMessage();
+        hideModal();
+      });
+    submitButton.disabled = false; 
   }
 };
-
-const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
 
 const hideModal = () => {
   form.reset();
@@ -61,19 +60,19 @@ const hideModal = () => {
   pristine.reset();
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown); // Correct event listener removal
-  form.removeEventListener('submit', onFormSubmit); // Correct event listener removal
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit);
 };
 
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
   effectsPreview.forEach((element) => {
-    element.style.backgroundImage = `url(${imageURL})`; // Corrected template literal
+    element.style.backgroundImage = `url('${imageURL}')`; 
   });
+  form.addEventListener('submit', onFormSubmit);
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  form.addEventListener('submit', onFormSubmit);
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
