@@ -35,5 +35,3 @@ const renderThumbnailElements = (picturesArray) => {
 
 export { renderThumbnailElements };
 
-
-
