@@ -35,32 +35,4 @@ export const NAMES = [
   'Артем',
 ];
 
-// const generateCommentId = createIdGenerator();
 
-// const createMessage = () => Array.from (
-//   { length: getRandomInteger(1,2) },
-//   () => getRandomArrayElement(COMMENTS),
-// ).join('');
-
-// export const createComment = () => ({
-//   id: generateCommentId(),
-//   avatar: `img/avatar-${getRandomInteger(1, AVATAR_COUNT)}.svg`,
-//   message: createMessage(),
-//   name: getRandomArrayElement(NAMES),
-// });
-
-// export const createPicture = (index) => ({
-//   id: index,
-//   url: `photos/${index}.jpg`,
-//   descriptions: getRandomArrayElement(DESCRIPTIONS),
-//   likes: getRandomInteger(MIN_LIKES_COUNT, MAX_LIKES_COUNT),
-//   comments: Array.from(
-//     { length: getRandomInteger(0, COMMENT_COUNT) },
-//     createComment,
-//   ),
-// });
-
-// export const getPictures = () => Array.from(
-//   { length: PICTURE_COUNT },
-//   (_, index) => createPicture(index + 1),
-// );

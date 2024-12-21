@@ -1,7 +1,7 @@
 import { resetImageScale } from './scale.js';
-import { init as initEffect, reset as resetEffect} from './effects.js';
-import {sendData} from './api.js';
-import { displaySuccessMessage, displayErrorMessage  } from './message.js';
+import { init as initEffect, reset as resetEffect } from './effects.js';
+import { sendData } from './api.js';
+import { displaySuccessMessage, displayErrorMessage } from './message.js';
 
 const body = document.querySelector('body');
 const form = document.querySelector('.img-upload__form');
@@ -18,7 +18,7 @@ const MAX_HASHTAG_COUNT = 5;
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const ErrorText = {
   INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
-  NOT_UNIQUE: 'Хешетеги должны быть уникальными',
+  NOT_UNIQUE: 'Хештеги должны быть уникальными',
   INVALID_PATTERN: 'Неправильный хештег',
 };
 
@@ -34,9 +34,9 @@ const showModal = (evt) => {
   effectsPreview.forEach((element) => {
     element.style.backgroundImage = `url('${imageURL}')`;
   });
-  form.addEventListener('submit', onFormSubmit);
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
+  form.addEventListener('submit', onFormSubmit);
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
@@ -68,21 +68,22 @@ const onFileInputChange = (evt) => {
   showModal(evt);
 };
 
-const onFormSubmit = ('submit', async (evt) => {
+const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
     submitButton.disabled = true;
-    await sendData(new FormData(form))
-    .then (() => {
+    try {
+      await sendData(new FormData(form));
       displaySuccessMessage();
       hideModal();
-    })
-    .catch(() => {
+    } catch {
       displayErrorMessage();
       hideModal();
-    })
+    } finally {
+      submitButton.disabled = false; // Разблокируем кнопку после выполнения
+    }
   }
-});
+};
 
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
@@ -100,7 +101,5 @@ const hasUniqueTags = (value) => {
 };
 
 pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
-
 pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
-
 pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);
