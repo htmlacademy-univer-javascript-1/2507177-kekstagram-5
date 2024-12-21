@@ -61,14 +61,6 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
-const onCancelButtonClick = () => {
-  hideModal();
-};
-
-const onFileInputChange = (evt) => {
-  showModal(evt);
-};
-
 const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
@@ -84,6 +76,14 @@ const onFormSubmit = async (evt) => {
       });
     submitButton.disabled = false; // Разблокировка кнопки в конце
   }
+};
+
+const onCancelButtonClick = () => {
+  hideModal();
+};
+
+const onFileInputChange = (evt) => {
+  showModal(evt);
 };
 
 // Назначаем обработчики событий
