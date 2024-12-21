@@ -1,7 +1,7 @@
 import { resetImageScale } from './scale.js';
 import { init as initEffect, reset as resetEffect } from './effects.js';
 import { sendData } from './api.js';
-import { displaySuccessMessage, displayErrorMessage } from './message.js';
+import { displayErrorMessage, displaySuccessMessage } from './message.js';
 
 const body = document.querySelector('body');
 const form = document.querySelector('.img-upload__form');
@@ -42,7 +42,7 @@ const showModal = (evt) => {
 
 const hideModal = () => {
   form.reset();
-  resetScale();
+  resetImageScale();
   resetEffect();
   pristine.reset();
   overlay.classList.add('hidden');
@@ -74,11 +74,11 @@ const onFormSubmit = ('submit', async (evt) => {
     submitButton.disabled = true;
     await sendData(new FormData(form))
     .then (() => {
-      showSuccessMessage();
+      displaySuccessMessage();
       hideModal();
     })
     .catch(() => {
-      showErrorMessage();
+      displayErrorMessage();
       hideModal();
     })
   }
