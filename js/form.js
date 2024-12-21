@@ -28,16 +28,14 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
-const hideModal = () => {
-  form.reset();
-  resetImageScale();
-  resetEffect();
-  pristine.reset();
-  overlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  form.removeEventListener('submit', onFormSubmit);
+// Объявляем функции перед их использованием
+const onDocumentKeydown = (evt) => {
+  if (evt.key === 'Escape' && !isTextFieldFocused()) {
+    evt.preventDefault();
+    hideModal();
+  }
 };
+
 const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
@@ -50,19 +48,25 @@ const onFormSubmit = async (evt) => {
       .catch(() => {
         displayErrorMessage();
         hideModal();
+      })
+      .finally(() => {
+        submitButton.disabled = false; // Разблокируем кнопку в конце
       });
-    submitButton.disabled = false;
   }
+};
+
+const hideModal = () => {
+  form.reset();
+  resetImageScale();
+  resetEffect();
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit);
 };
 
 const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
-
-const onDocumentKeydown = (evt) => {
-  if (evt.key === 'Escape' && !isTextFieldFocused()) {
-    evt.preventDefault();
-    hideModal();
-  }
-};
 
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
@@ -70,7 +74,7 @@ const showModal = (evt) => {
   effectsPreview.forEach((element) => {
     element.style.backgroundImage = `url('${imageURL}')`;
   });
-  form.addEventListener('submit', onFormSubmit);
+  form.addEventListener('submit', onFormSubmit); // Убедимся, что onFormSubmit определена
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
