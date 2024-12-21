@@ -28,39 +28,21 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
-
-const onFormSubmit = async (evt) => {
-  evt.preventDefault();
-  if (pristine.validate()) {
-    submitButton.disabled = true;
-    try {
-      await sendData(new FormData(form));
-      displaySuccessMessage();
-      hideModal();
-    } catch (error) { //Обработка ошибки
-      displayErrorMessage(error); //Передача ошибки в функцию вывода сообщения об ошибке
-      console.error("Ошибка отправки данных:", error); //Логирование ошибки в консоль
-    } finally {
-      submitButton.disabled = false;
-    }
-  }
-};
-
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
   effectsPreview.forEach((element) => {
-    element.style.backgroundImage = `url(${imageURL})`; // Исправлено: добавили обратные кавычки
+    element.style.backgroundImage = `url('${imageURL}')`;
   });
+  form.addEventListener('submit', onFormSubmit);
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  form.addEventListener('submit', onFormSubmit); // Теперь onFormSubmit определена
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
 const hideModal = () => {
   form.reset();
-  resetImageScale();
+  resetScale();
   resetEffect();
   pristine.reset();
   overlay.classList.add('hidden');
@@ -86,6 +68,21 @@ const onFileInputChange = (evt) => {
   showModal(evt);
 };
 
+const onFormSubmit = ('submit', async (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    submitButton.disabled = true;
+    await sendData(new FormData(form))
+    .then (() => {
+      showSuccessMessage();
+      hideModal();
+    })
+    .catch(() => {
+      showErrorMessage();
+      hideModal();
+    })
+  }
+});
 
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
@@ -95,7 +92,6 @@ const normalizeTags = (tagString) => tagString.trim().split(' ').filter((tag) =>
 
 const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_SYMBOLS.test(tag));
 
-
 const hasValidCount = (value) => normalizeTags(value).length <= MAX_HASHTAG_COUNT;
 
 const hasUniqueTags = (value) => {
@@ -104,5 +100,7 @@ const hasUniqueTags = (value) => {
 };
 
 pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
+
 pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
+
 pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);
