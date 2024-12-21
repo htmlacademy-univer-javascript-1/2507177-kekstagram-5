@@ -18,7 +18,7 @@ const MAX_HASHTAG_COUNT = 5;
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const ErrorText = {
   INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
-  NOT_UNIQUE: 'Хештеги должны быть уникальными',
+  NOT_UNIQUE: 'Хешетеги должны быть уникальными',
   INVALID_PATTERN: 'Неправильный хештег',
 };
 
@@ -26,6 +26,33 @@ const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__field-wrapper--error',
+});
+
+const hideModal = () => {
+  form.reset();
+  resetImageScale();
+  resetEffect();
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit); // eslint-disable-line
+};
+
+const onFormSubmit = (async (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    submitButton.disabled = true;
+    await sendData(new FormData(form))
+      .then (() => {
+        displaySuccessMessage();
+        hideModal();
+      })
+      .catch(() => {
+        displayErrorMessage();
+        hideModal();
+      });
+  }
 });
 
 const showModal = (evt) => {
@@ -38,17 +65,6 @@ const showModal = (evt) => {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
-};
-
-const hideModal = () => {
-  form.reset();
-  resetImageScale();
-  resetEffect();
-  pristine.reset();
-  overlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  form.removeEventListener('submit', onFormSubmit);
 };
 
 const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
@@ -68,25 +84,10 @@ const onFileInputChange = (evt) => {
   showModal(evt);
 };
 
-const onFormSubmit = ('submit', async (evt) => {
-  evt.preventDefault();
-  if (pristine.validate()) {
-    submitButton.disabled = true;
-    await sendData(new FormData(form))
-    .then (() => {
-      displaySuccessMessage();
-      hideModal();
-    })
-    .catch(() => {
-      displayErrorMessage();
-      hideModal();
-    })
-  }
-});
-
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
 initEffect();
+
 const normalizeTags = (tagString) => tagString.trim().split(' ').filter((tag) => Boolean(tag.length));
 
 const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_SYMBOLS.test(tag));
