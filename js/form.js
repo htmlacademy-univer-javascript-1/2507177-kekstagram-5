@@ -36,7 +36,7 @@ const hideModal = () => {
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
-  form.removeEventListener('submit', onFormSubmit); // eslint-disable-line
+
 };
 
 const onFormSubmit = (async (evt) => {
