@@ -1,5 +1,5 @@
 const getRandomInteger = (a, b) =>
-  Math.floor(Math.random() * (Math.abs(b - a) + 1)) + Math.min(a, b); // Убрана фигурная скобка
+  Math.floor(Math.random() * (Math.abs(b - a) + 1)) + Math.min(a, b);
 
 const getRandomElementsArray = (array, count) => {
   const randomIndexList = [];
@@ -10,7 +10,7 @@ const getRandomElementsArray = (array, count) => {
       randomIndexList.push(index);
     }
   }
-  return randomIndexList.map((index) => array[index]); // Лишняя фигурная скобка убрана
+  return randomIndexList.map((index) => array[index]);
 };
 
 const debounce = (callback, timeoutDelay = 500) => {
@@ -23,7 +23,7 @@ const debounce = (callback, timeoutDelay = 500) => {
 };
 
 const getUniqueNumber = (list, usedNumbers) => {
-  const uniqueNumber = list.find((number) => !usedNumbers.includes(number)); // Добавлены скобки
+  const uniqueNumber = list.find((number) => !usedNumbers.includes(number));
   if (uniqueNumber !== undefined) {
     usedNumbers.push(uniqueNumber);
   }

@@ -17,7 +17,7 @@ const hashtagField = form.querySelector('.text__hashtags');
 const MAX_HASHTAG_COUNT = 5;
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const ErrorText = {
-  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`, // Corrected template literal
+  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
   NOT_UNIQUE: 'Хештеги должны быть уникальными',
   INVALID_PATTERN: 'Неправильный хештег',
 };
@@ -49,7 +49,7 @@ const onFormSubmit = async (evt) => {
         displayErrorMessage();
         hideModal();
       });
-    submitButton.disabled = false; 
+    submitButton.disabled = false;
   }
 };
 
@@ -68,7 +68,7 @@ const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
   effectsPreview.forEach((element) => {
-    element.style.backgroundImage = `url('${imageURL}')`; 
+    element.style.backgroundImage = `url('${imageURL}')`;
   });
   form.addEventListener('submit', onFormSubmit);
   overlay.classList.remove('hidden');
