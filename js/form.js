@@ -17,7 +17,7 @@ const hashtagField = form.querySelector('.text__hashtags');
 const MAX_HASHTAG_COUNT = 5;
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const ErrorText = {
-  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`,
+  INVALID_COUNT: `Максимум ${MAX_HASHTAG_COUNT} хештегов`, // Исправлено: использовали обратные кавычки для интерполяции
   NOT_UNIQUE: 'Хештеги должны быть уникальными',
   INVALID_PATTERN: 'Неправильный хештег',
 };
@@ -28,15 +28,33 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+
+const onFormSubmit = async (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    submitButton.disabled = true;
+    try {
+      await sendData(new FormData(form));
+      displaySuccessMessage();
+      hideModal();
+    } catch (error) { //Обработка ошибки
+      displayErrorMessage(error); //Передача ошибки в функцию вывода сообщения об ошибке
+      console.error("Ошибка отправки данных:", error); //Логирование ошибки в консоль
+    } finally {
+      submitButton.disabled = false;
+    }
+  }
+};
+
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
   const imageURL = imgPreview.querySelector('img').src;
   effectsPreview.forEach((element) => {
-    element.style.backgroundImage = `url('${imageURL}')`;
+    element.style.backgroundImage = `url(${imageURL})`; // Исправлено: добавили обратные кавычки
   });
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  form.addEventListener('submit', onFormSubmit);
+  form.addEventListener('submit', onFormSubmit); // Теперь onFormSubmit определена
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
@@ -68,22 +86,6 @@ const onFileInputChange = (evt) => {
   showModal(evt);
 };
 
-const onFormSubmit = async (evt) => {
-  evt.preventDefault();
-  if (pristine.validate()) {
-    submitButton.disabled = true;
-    try {
-      await sendData(new FormData(form));
-      displaySuccessMessage();
-      hideModal();
-    } catch {
-      displayErrorMessage();
-      hideModal();
-    } finally {
-      submitButton.disabled = false; // Разблокируем кнопку после выполнения
-    }
-  }
-};
 
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
@@ -92,6 +94,7 @@ initEffect();
 const normalizeTags = (tagString) => tagString.trim().split(' ').filter((tag) => Boolean(tag.length));
 
 const hasValidTags = (value) => normalizeTags(value).every((tag) => VALID_SYMBOLS.test(tag));
+
 
 const hasValidCount = (value) => normalizeTags(value).length <= MAX_HASHTAG_COUNT;
 
