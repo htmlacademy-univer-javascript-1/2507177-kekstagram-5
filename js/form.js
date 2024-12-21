@@ -28,6 +28,19 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+const hideModal = () => {
+  form.reset();
+  resetImageScale();
+  resetEffect();
+  pristine.reset();
+  overlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  form.removeEventListener('submit', onFormSubmit);
+};
+
+
+const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
 
 const onDocumentKeydown = (evt) => {
   if (evt.key === 'Escape' && !isTextFieldFocused()) {
@@ -53,18 +66,9 @@ const onFormSubmit = async (evt) => {
   }
 };
 
-const hideModal = () => {
-  form.reset();
-  resetImageScale();
-  resetEffect();
-  pristine.reset();
-  overlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  form.removeEventListener('submit', onFormSubmit);
-};
 
-const isTextFieldFocused = () => document.activeElement === hashtagField || document.activeElement === commentField;
+
+
 
 const showModal = (evt) => {
   imgPreview.querySelector('img').src = URL.createObjectURL(evt.target.files[0]);
