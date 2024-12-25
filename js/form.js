@@ -29,36 +29,36 @@ const pristine = new Pristine(form, {
 });
 
 const hideModal = () => {
-  // Очищаем форму и сбрасываем состояние
+
   form.reset();
   resetImageScale();
   resetEffect();
   pristine.reset();
 
-  // Очистка изображения предпросмотра
-  imgPreview.querySelector('img').src = ''; // Убираем старое изображение
+
+  imgPreview.querySelector('img').src = '';
   effectsPreview.forEach((element) => {
     element.style.backgroundImage = '';
   });
 
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
-  submitButton.disabled = false; // Разблокируем кнопку отправки
+  submitButton.disabled = false;
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
 const onFormSubmit = async (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
-    submitButton.disabled = true; // Блокируем кнопку отправки при отправке
+    submitButton.disabled = true;
     await sendData(new FormData(form))
       .then(() => {
         displaySuccessMessage();
-        hideModal(); // Скрываем модал после успешной отправки
+        hideModal();
       })
       .catch(() => {
         displayErrorMessage();
-        submitButton.disabled = false; // Разблокируем кнопку в случае ошибки
+        submitButton.disabled = false;
       });
   }
 };
@@ -107,7 +107,7 @@ const hasUniqueTags = (value) => {
   return lowerCaseTags.length === new Set(lowerCaseTags).size;
 };
 
-// Добавляем скобки вокруг аргументов стрелочных функций
+
 pristine.addValidator(hashtagField, (value) => hasValidCount(value), ErrorText.INVALID_COUNT, 3, true);
 pristine.addValidator(hashtagField, (value) => hasUniqueTags(value), ErrorText.NOT_UNIQUE, 1, true);
 pristine.addValidator(hashtagField, (value) => hasValidTags(value), ErrorText.INVALID_PATTERN, 2, true);
