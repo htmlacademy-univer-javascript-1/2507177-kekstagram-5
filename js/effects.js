@@ -74,7 +74,7 @@ let chosenEffect = Effect.DEFAULT;
 
 const setImageStyle = () => {
   if (chosenEffect === Effect.DEFAULT) {
-    imageElement.style.filter = null;
+    imageElement.style.filter = '';
     return;
   }
 
@@ -133,6 +133,7 @@ const setSlider = () => {
 const setEffect = (effect) => {
   chosenEffect = effect;
   setSlider();
+  setImageStyle();
 };
 
 const reset = () => {

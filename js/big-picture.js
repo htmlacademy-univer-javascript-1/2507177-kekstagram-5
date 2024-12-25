@@ -1,11 +1,11 @@
 import { isEscape } from './util.js';
 
 const documentBody = document.querySelector('body');
-const closeButtonElement = document.querySelector('.big-picture__cancel');
+const closeButton = document.querySelector('.big-picture__cancel');
 const bigPictureModal = document.querySelector('.big-picture');
-const commentsListElement = document.querySelector('.social__comments');
-const commentsLoaderElement = document.querySelector('.comments-loader');
-const socialCommentsCountElement = document.querySelector('.social__comment-count');
+const commentsList = document.querySelector('.social__comments');
+const commentsLoader = document.querySelector('.comments-loader');
+const socialCommentsCount = document.querySelector('.social__comment-count');
 
 const COMMENTS_PER_LOAD = 5;
 
@@ -36,10 +36,10 @@ const renderComments = () => {
   displayedCommentsCount += COMMENTS_PER_LOAD;
 
   if (displayedCommentsCount >= allComments.length) {
-    commentsLoaderElement.classList.add('hidden');
+    commentsLoader.classList.add('hidden');
     displayedCommentsCount = allComments.length;
   } else {
-    commentsLoaderElement.classList.remove('hidden');
+    commentsLoader.classList.remove('hidden');
   }
 
   const fragment = document.createDocumentFragment();
@@ -47,9 +47,9 @@ const renderComments = () => {
     fragment.append(createCommentElement(allComments[index]));
   }
 
-  commentsListElement.innerHTML = '';
-  commentsListElement.append(fragment);
-  socialCommentsCountElement.innerHTML = `${displayedCommentsCount} из <span class="comments-count">${allComments.length}</span> комментариев`;
+  commentsList.innerHTML = '';
+  commentsList.append(fragment);
+  socialCommentsCount.innerHTML = `${displayedCommentsCount} из <span class="comments-count">${allComments.length}</span> комментариев`;
 };
 
 const onEscKeydown = (evt) => {
@@ -77,7 +77,7 @@ function closeBigPicture() {
   displayedCommentsCount = 0;
 }
 
-commentsLoaderElement.addEventListener('click', () => {
+commentsLoader.addEventListener('click', () => {
   renderComments();
 });
 
@@ -85,6 +85,6 @@ const onCloseButtonClick = () => {
   closeBigPicture();
 };
 
-closeButtonElement.addEventListener('click', onCloseButtonClick);
+closeButton.addEventListener('click', onCloseButtonClick);
 
 export { openBigPicture };
