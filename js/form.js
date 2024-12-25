@@ -37,7 +37,7 @@ const hideModal = () => {
 
   // Очистка изображения предпросмотра
   imgPreview.querySelector('img').src = ''; // Убираем старое изображение
-  effectsPreview.forEach(element => {
+  effectsPreview.forEach((element) => {
     element.style.backgroundImage = '';
   });
 
@@ -107,6 +107,7 @@ const hasUniqueTags = (value) => {
   return lowerCaseTags.length === new Set(lowerCaseTags).size;
 };
 
-pristine.addValidator(hashtagField, hasValidCount, ErrorText.INVALID_COUNT, 3, true);
-pristine.addValidator(hashtagField, hasUniqueTags, ErrorText.NOT_UNIQUE, 1, true);
-pristine.addValidator(hashtagField, hasValidTags, ErrorText.INVALID_PATTERN, 2, true);
+// Добавляем скобки вокруг аргументов стрелочных функций
+pristine.addValidator(hashtagField, (value) => hasValidCount(value), ErrorText.INVALID_COUNT, 3, true);
+pristine.addValidator(hashtagField, (value) => hasUniqueTags(value), ErrorText.NOT_UNIQUE, 1, true);
+pristine.addValidator(hashtagField, (value) => hasValidTags(value), ErrorText.INVALID_PATTERN, 2, true);
