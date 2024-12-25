@@ -4,6 +4,15 @@ const documentBody = document.body;
 const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
 
+
+const offCloseMessageByEscape = () => {
+  document.removeEventListener('keydown', closeMessageByEscape);
+};
+
+const offCloseMessageByBodyClick = () => {
+  documentBody.removeEventListener('click', closeMessageByBodyClick);
+};
+
 const removeMessage = () => {
   const activeMessage = document.querySelector('.success') || document.querySelector('.error');
   const closeButton = document.querySelector('.success__button') || document.querySelector('.error__button');
@@ -28,22 +37,12 @@ function closeMessageByBodyClick(evt) {
   }
 }
 
-
 const onCloseMessageByEscape = () => {
   document.addEventListener('keydown', closeMessageByEscape);
 };
 
 const onCloseMessageByBodyClick = () => {
   documentBody.addEventListener('click', closeMessageByBodyClick);
-};
-
-
-const offCloseMessageByEscape = () => {
-  document.removeEventListener('keydown', closeMessageByEscape);
-};
-
-const offCloseMessageByBodyClick = () => {
-  documentBody.removeEventListener('click', closeMessageByBodyClick);
 };
 
 const displayMessage = (messageTemplate, closeButtonSelector) => {
