@@ -1,15 +1,26 @@
-import {isEscape} from './util.js';
+import { isEscape } from './util.js';
 
 const documentBody = document.body;
 const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
 
+
+const offCloseMessageByEscape = () => {
+  document.removeEventListener('keydown', closeMessageByEscape);
+};
+
+const offCloseMessageByBodyClick = () => {
+  documentBody.removeEventListener('click', closeMessageByBodyClick);
+};
+
 const removeMessage = () => {
   const activeMessage = document.querySelector('.success') || document.querySelector('.error');
   const closeButton = document.querySelector('.success__button') || document.querySelector('.error__button');
-  document.removeEventListener('keydown', closeMessageByEscape);
-  documentBody.removeEventListener('click', closeMessageByBodyClick);
-  closeButton.removeEventListener('click', removeMessage);
+  offCloseMessageByEscape();
+  offCloseMessageByBodyClick();
+  if (closeButton) {
+    closeButton.removeEventListener('click', removeMessage);
+  }
   activeMessage.remove();
 };
 
@@ -26,10 +37,18 @@ function closeMessageByBodyClick(evt) {
   }
 }
 
+const onCloseMessageByEscape = () => {
+  document.addEventListener('keydown', closeMessageByEscape);
+};
+
+const onCloseMessageByBodyClick = () => {
+  documentBody.addEventListener('click', closeMessageByBodyClick);
+};
+
 const displayMessage = (messageTemplate, closeButtonSelector) => {
   documentBody.append(messageTemplate);
-  document.addEventListener('keydown', closeMessageByEscape);
-  documentBody.addEventListener('click', closeMessageByBodyClick);
+  onCloseMessageByEscape();
+  onCloseMessageByBodyClick();
   documentBody.querySelector(closeButtonSelector).addEventListener('click', removeMessage);
 };
 
